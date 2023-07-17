@@ -217,7 +217,7 @@ public class BillService
         result += $"{groups[0].Room.Name}: {Math.Round(personCalculations.SelectMany(x => x.PersonCalculationGroups).Sum(x => x.PersonPrice))}₽\n\n";
         result += groupResult + "\n";
 
-        foreach (var personCalculation in personCalculations)
+        foreach (var personCalculation in personCalculations.OrderBy(x => x.PersonCalculationGroups.Sum(y => y.PersonPrice)))
         {
             personCalculation.TotalPrice = personCalculation.PersonCalculationGroups.Sum(x => x.PersonPrice);
 
