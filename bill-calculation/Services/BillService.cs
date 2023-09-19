@@ -4,22 +4,6 @@ using MongoDB.Driver;
 
 public class BillService
 {
-    private List<string> defPersons = new List<string> { 
-        "Коля",
-        "Саша",
-        "Нияз",
-        "Марат",
-        "Булат",
-        "Рамиль",
-        "Рустам"
-    };
-
-    private List<string> defGroups = new List<string> {
-        "Кальян",
-        "Лимонад",
-        "Чай"
-    };
-
     private readonly IMongoService _mongoService;
 
     public BillService(IMongoService mongoService)
@@ -33,22 +17,6 @@ public class BillService
         var room = new Room { Name = name };
 
         await rooms.InsertOneAsync(room);
-
-        var persons = _mongoService.GetCollection<Person>();
-
-        foreach (var defPerson in defPersons)
-        {
-            var person = new Person { Room = room, Name = defPerson };
-            await persons.InsertOneAsync(person);
-        }
-
-        var groups = _mongoService.GetCollection<Group>();
-
-        foreach (var defGroup in defGroups)
-        {
-            var person = new Group { Room = room, Name = defGroup, Count = 1 };
-            await groups.InsertOneAsync(person);
-        }
 
         return room;
     }
