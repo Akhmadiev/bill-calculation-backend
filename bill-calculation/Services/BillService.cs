@@ -2,7 +2,7 @@
 
 using MongoDB.Driver;
 
-public class BillService
+public class BillService : IBillService
 {
     private readonly IMongoService _mongoService;
 

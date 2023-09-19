@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 [Route("[controller]")]
 public class BillController : ControllerBase
 {
-    private readonly BillService _billService;
+    private readonly IBillService _billService;
 
     public BillController(BillService billService)
     {

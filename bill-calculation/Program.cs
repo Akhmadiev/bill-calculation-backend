@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IMongoService, MongoService>();
+builder.Services.AddSingleton<IBillService, BillService>();
 builder.Services.AddSingleton<BillService>();
 
 var configuration = new Configuration();
@@ -33,7 +34,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
