@@ -4,6 +4,20 @@ using MongoDB.Driver;
 
 public class BillService : IBillService
 {
+    private List<string> defPersons = new List<string> {
+        "Коля",
+        "Саша",
+        "Нияз",
+        "Марат",
+        "Булат",
+        "Рамиль",
+        "Рустам"
+    };
+
+    private List<string> defGroups = new List<string> {
+        "Кальян"
+    };
+
     private readonly IMongoService _mongoService;
 
     public BillService(IMongoService mongoService)
@@ -17,6 +31,22 @@ public class BillService : IBillService
         var room = new Room { Name = name };
 
         await rooms.InsertOneAsync(room);
+
+        var persons = _mongoService.GetCollection<Person>();
+
+        foreach (var defPerson in defPersons)
+        {
+            var person = new Person { Room = room, Name = defPerson };
+            await persons.InsertOneAsync(person);
+        }
+
+        var groups = _mongoService.GetCollection<Group>();
+
+        foreach (var defGroup in defGroups)
+        {
+            var person = new Group { Room = room, Name = defGroup, Count = 1 };
+            await groups.InsertOneAsync(person);
+        }
 
         return room;
     }
@@ -68,6 +98,33 @@ public class BillService : IBillService
         await groups.UpdateOneAsync(filter, update);
     }
 
+    public async Task AddGroupPersons(Guid groupId, Guid[] personIds)
+    {
+        var groups = _mongoService.GetCollection<Group>();
+        var group = await groups.Find(x => x.Id == groupId).FirstOrDefaultAsync();
+        var persons = _mongoService.GetCollection<Person>();
+        var newPersons = await persons.Find(x => personIds.Contains(x.Id)).ToListAsync();
+
+        if (group.Persons == null)
+        {
+            group.Persons = new List<Person>();
+        }
+
+        newPersons = newPersons.Where(x => group.Persons.All(y => y.Id != x.Id)).ToList();
+
+        if (newPersons.Count == 0)
+        {
+            return;
+        }
+
+        group.Persons.AddRange(newPersons);
+
+        var filter = Builders<Group>.Filter.Eq(x => x.Id, groupId);
+        var update = Builders<Group>.Update.Set(x => x.Persons, group.Persons);
+
+        await groups.UpdateOneAsync(filter, update);
+    }
+
     public async Task DeleteGroupPerson(Guid groupId, Guid personId)
     {
         var groups = _mongoService.GetCollection<Group>();
@@ -111,6 +168,27 @@ public class BillService : IBillService
         var update = Builders<Group>.Update.Set(x => x.Price, price);
 
         await groups.UpdateOneAsync(filter, update);
+    }
+
+    public async Task ChangeGroupName(Guid groupId, string name)
+    {
+        var groups = _mongoService.GetCollection<Group>();
+        var group = await groups.Find(x => x.Id == groupId).FirstOrDefaultAsync();
+
+        var filter = Builders<Group>.Filter.Eq(x => x.Id, groupId);
+        var update = Builders<Group>.Update.Set(x => x.Name, name);
+
+        await groups.UpdateOneAsync(filter, update);
+    }
+
+    public async Task CopyGroup(Guid groupId)
+    {
+        var groups = _mongoService.GetCollection<Group>();
+        var group = await groups.Find(x => x.Id == groupId).FirstOrDefaultAsync();
+
+        var newGroup = new Group { Room = group.Room, Name = group.Name, Count = group.Count, Price = group.Price, Persons = group.Persons };
+
+        await groups.InsertOneAsync(newGroup);
     }
 
     public async Task<List<Room>> GetRooms()

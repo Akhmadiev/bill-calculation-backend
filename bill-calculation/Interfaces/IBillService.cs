@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿using Microsoft.AspNetCore.Mvc;
+/// <summary>
 /// Сервис расчета чека
 /// </summary>
 public interface IBillService
@@ -12,6 +13,11 @@ public interface IBillService
     /// Добавить персону в группу
     /// </summary>
     Task AddGroupPerson(Guid groupId, Guid personId);
+
+    /// <summary>
+    /// Добавить персон в группу
+    /// </summary>
+    Task AddGroupPersons(Guid groupId, Guid[] personIds);
 
     /// <summary>
     /// Добавить персону в комнату
@@ -32,6 +38,16 @@ public interface IBillService
     /// Поменять цену группы
     /// </summary>
     Task ChangeGroupPrice(Guid groupId, decimal price);
+
+    /// <summary>
+    /// Поменять имя группы
+    /// </summary>
+    Task ChangeGroupName(Guid groupId, string name);
+
+    /// <summary>
+    /// Скопировать группу
+    /// </summary>
+    Task CopyGroup(Guid groupId);
 
     /// <summary>
     /// Создать комнату

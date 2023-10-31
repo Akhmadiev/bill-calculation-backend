@@ -5,9 +5,9 @@ public class MongoService : IMongoService
     private readonly IMongoDatabase _database;
     private readonly MongoClient _client;
 
-    private readonly Configuration _configuration;
+    private readonly bill_calculation.Configuration.Configuration _configuration;
 
-    public MongoService(Configuration configuration)
+    public MongoService(bill_calculation.Configuration.Configuration configuration)
     {
         _configuration = configuration;
         _client ??= new MongoClient(_configuration.Mongo.ConnectionString);

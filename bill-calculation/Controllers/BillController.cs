@@ -2,16 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 [ApiController]
 [Route("[controller]")]
 public class BillController : ControllerBase
 {
     private readonly IBillService _billService;
+    private readonly ITelegramService _telegramService;
 
-    public BillController(BillService billService)
+    public BillController(BillService billService, ITelegramService telegramService)
     {
         _billService = billService;
+        _telegramService = telegramService;
     }
 
     [HttpGet("GetRooms")]
@@ -62,6 +65,13 @@ public class BillController : ControllerBase
         await _billService.AddGroupPerson(groupId, personId);
     }
 
+    [HttpPost("AddGroupPersons")]
+    public async Task AddGroupPersons(Guid groupId, Guid[] personIds)
+    {
+        await _billService.AddGroupPersons(groupId, personIds);
+    }
+
+
     [HttpPost("DeleteGroupPerson")]
     public async Task DeleteGroupPerson(Guid groupId, Guid personId)
     {
@@ -86,9 +96,27 @@ public class BillController : ControllerBase
         await _billService.ChangeGroupPrice(groupId, price);
     }
 
+    [HttpPost("ChangeGroupName")]
+    public async Task ChangeGroupName(Guid groupId, string name)
+    {
+        await _billService.ChangeGroupName(groupId, name);
+    }
+
+    [HttpPost("CopyGroup")]
+    public async Task CopyGroup(Guid groupId)
+    {
+        await _billService.CopyGroup(groupId);
+    }
+
     [HttpGet("Calculate")]
     public async Task<string> Calculate(Guid roomId)
     {
         return await _billService.Calculate(roomId);
+    }
+
+    [HttpPost("SendToTelegram")]
+    public async Task SendToTelegram([FromBody] string text)
+    {
+        await _telegramService.SendMessage(text);
     }
 }

@@ -1,3 +1,5 @@
+using bill_calculation.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
@@ -16,9 +18,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IMongoService, MongoService>();
 builder.Services.AddSingleton<IBillService, BillService>();
+builder.Services.AddSingleton<ITelegramService, TelegramService>();
 builder.Services.AddSingleton<BillService>();
 
-var configuration = new Configuration();
+var configuration = new bill_calculation.Configuration.Configuration();
 builder.Configuration.Bind(configuration);
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors();
